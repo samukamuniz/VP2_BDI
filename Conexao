@@ -1,0 +1,32 @@
+package br.edu.fa7.bancodedadosi;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Conexao {
+	private String connectionUrl = "jdbc:sqlserver://localhost:1433;" + "databaseName=BdPosto";
+	private Statement statement;
+	private Connection connection;
+		
+	public void iniciarConexao() throws SQLException, Exception {
+		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
+		connection = DriverManager.getConnection(connectionUrl, "samuka", "Samv1602");
+	}
+	
+	public ResultSet realizarConsulta(String consulta) throws SQLException{
+		statement = connection.createStatement();
+		ResultSet rs = statement.executeQuery(consulta);
+		return rs;
+	}
+	
+	public void encerrandoConsulta() throws SQLException {
+		statement.close();
+	}
+	
+	public void encerrandoConexao() throws SQLException {
+		connection.close();
+	}
+}
