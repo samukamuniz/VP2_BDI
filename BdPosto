@@ -1,0 +1,67 @@
+package br.edu.fa7.bancodedadosi;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class BdPosto {
+
+	public static void main(String[] args) {
+		Conexao conexao = new Conexao();
+		ResultSet rs;
+		try {
+			conexao.iniciarConexao();
+			rs = conexao.realizarConsulta("select *from PESQUISA1");
+			
+			System.out.println("\n\nConsulta 1------------------------------------------------------------------------------------------------------");
+
+			while(rs.next()) {
+
+				int cnpjPosto = rs.getInt("cnpj");
+				String razaoSocialPosto = rs.getString("razao_social");
+				String bancoPosto = rs.getString("bancoPosto");
+				String agenciaPosto = rs.getString("agenciaPosto");
+				String contaPosto = rs.getString("contaPosto");
+				int idCliente = rs.getInt("cliente");
+				String bancoCliente = rs.getString("bancoCliente");
+				String agenciaCliente = rs.getString("agenciaCliente");
+				String contaCliente = rs.getString("contaCliente");
+				String dataAbastecimento = rs.getString("data_abst");
+				double valorAbastecimento = rs.getDouble("valor_abst");
+				String vencAbastecimento = rs.getString("data_venc");
+				String formaPgto = rs.getString("descricao");
+				
+				System.out.println("\t" + cnpjPosto + "\t" + razaoSocialPosto + "\t" + bancoPosto
+						+ "\t" + agenciaPosto + "\t" + contaPosto
+						 + "\t" + idCliente + "\t" + bancoCliente
+						 + "\t" + agenciaCliente + "\t" + contaCliente
+						 + "\t" + dataAbastecimento + "\t" + valorAbastecimento
+						 + "\t" + vencAbastecimento + "\t" + formaPgto );
+			}
+						
+			conexao.encerrandoConsulta();
+			
+			System.out.println("Consulta 2------------------------------------------------------------------------------------------------------");
+					
+			rs = conexao.realizarConsulta("select * from PESQUISA2 order by 1,5");
+			while(rs.next()) {
+				int cliente= rs.getInt("cliente");
+				int qtdAbastecimento= rs.getInt("qtd_abastecimentos");
+				double val_Abastecido = rs.getDouble("valor_abastecido");
+				String pagamento = rs.getString("forma_pgto");
+				int mes= rs.getInt("mes");
+				System.out.println("\t" + cliente + "\t" + qtdAbastecimento 
+						+ "\t" + val_Abastecido + "\t" + pagamento + "\t" + mes);
+			}
+			
+			conexao.encerrandoConsulta();
+			conexao.encerrandoConexao();
+			
+		} catch (SQLException e) {
+			System.out.println("SQLException: " + e.getMessage());
+			System.out.println("SQLState: " + e.getSQLState());
+			System.out.println("VendorError: " + e.getErrorCode());
+		} catch (Exception e) {
+			System.out.println("Não foi possível conectar ao banco: " + e);
+		}
+	}
+}
