@@ -1,0 +1,127 @@
+USE BdPosto;
+
+CREATE TABLE CARGO 
+(
+	cod_cargo			integer not null,
+	descricao			varchar(30),
+	CONSTRAINT PK_CARGO PRIMARY KEY	(cod_cargo)
+);
+
+CREATE TABLE POSTO 
+(
+	cnpj				integer not null,
+	nome_fantasia			varchar(45),
+	razao_social			varchar(45) not null,
+	telefone			varchar(11),
+	banco				varchar(20) not null,
+	agencia				varchar(10) not null,
+	conta				varchar(10) not null,
+	mat_gerente			integer,
+	CONSTRAINT PK_POSTO PRIMARY KEY	(cnpj)
+);
+
+CREATE TABLE DEPARTAMENTO 
+(
+	cod_depto			integer not null,
+	descricao			varchar(30),
+	cnpj_posto			integer not null
+	CONSTRAINT PK_DEPARTAMENTO PRIMARY KEY	(cod_depto),
+	CONSTRAINT FK_DEPARTAMENTO_POSTO FOREIGN KEY (cnpj_posto) REFERENCES POSTO (cnpj)
+);
+
+CREATE TABLE EMPREGADO 
+(
+	matricula			integer not null,
+	cpf				integer not null,
+	rg				integer not null,
+	nome				varchar(45) not null,
+	data_nasc			date,
+	tip_sexo			varchar (1),
+	nome_pai			varchar(45),
+	nome_mae			varchar(45),
+	lotacao				integer not null,
+	mat_gerente			integer,
+	cod_cargo			integer not null,
+	CONSTRAINT PK_EMPREGADO PRIMARY KEY (matricula),
+	CONSTRAINT FK_EMPREGADO_DEPARTAMENTO FOREIGN KEY (lotacao) REFERENCES DEPARTAMENTO (cod_depto),
+	CONSTRAINT FK_EMPREGADO_GERENTE	FOREIGN KEY (mat_gerente) REFERENCES EMPREGADO (matricula),
+	CONSTRAINT FK_EMPREGADO_CARGO FOREIGN KEY (cod_cargo) REFERENCES CARGO (cod_cargo),
+	CONSTRAINT UNQ_EMPREGADO_CPF UNIQUE (cpf),
+	CONSTRAINT UNQ_EMPREGADO_RG UNIQUE (rg)
+);
+
+ALTER TABLE POSTO ADD CONSTRAINT FK_POSTO_GERENTE 
+	FOREIGN KEY (mat_gerente) REFERENCES EMPREGADO (matricula);
+
+CREATE TABLE CLIENTE 
+(
+	cpf_cnpj			integer not null,
+	banco				varchar(20) not null,
+	agencia				varchar(10) not null,
+	conta				varchar(10) not null,
+	CONSTRAINT PK_CLIENTE PRIMARY KEY (cpf_cnpj)
+);
+
+CREATE TABLE CLIENTE_JUR 
+(
+	cnpj				integer not null,
+	nome_fantasia			varchar(45),
+	razao_social			varchar(45) not null,
+	endereco			varchar(50),
+	telefone			varchar(11),
+	CONSTRAINT PK_CLIENTE_JUR PRIMARY KEY (cnpj),
+	CONSTRAINT FK_CLIENTE_JUR FOREIGN KEY (cnpj) REFERENCES CLIENTE (cpf_cnpj)
+);
+
+CREATE TABLE CLIENTE_FIS 
+(
+	cpf				integer not null,
+	cnh				integer not null,
+	nome				varchar(45) not null,
+	endereco			varchar(50),
+	telefone			varchar(11),
+	CONSTRAINT PK_CLIENTE_FIS PRIMARY KEY (cpf),
+	CONSTRAINT FK_CLIENTE_FIS FOREIGN KEY (cpf) REFERENCES CLIENTE (cpf_cnpj),
+	CONSTRAINT UNQ_CLIENTE_FIS_CNH UNIQUE (cnh)
+);
+
+CREATE TABLE DEPENDENTE 
+(
+	cnh				integer not null,
+	cpf_titular			integer not null,
+	cpf				integer not null,
+	nome				varchar(45) not null,
+	endereco			varchar(50),
+	telefone			varchar(11),
+	CONSTRAINT PK_DEPENDENTE PRIMARY KEY (cnh, cpf_titular),
+	CONSTRAINT FK_DEPENDENTE_CLIENTE_FIS FOREIGN KEY (cpf_titular) REFERENCES CLIENTE_FIS (cpf),
+	CONSTRAINT UNQ_DEPENDENTE UNIQUE (cpf)
+);
+
+CREATE TABLE PAGAMENTO 
+(
+	cod_pgto			integer not null,
+	descricao			varchar(20),
+	CONSTRAINT PK_PAGAMENTO PRIMARY KEY (cod_pgto)
+);
+
+CREATE TABLE ABASTECIMENTO 
+(
+	cod_abst			integer not null IDENTITY(1001,1),
+	cnpj_posto			integer not null,
+	mat_empregado			integer not null,
+	cpf_cnpj			integer,
+	cnh_dep				integer,
+	cpf_titular_dep			integer,
+	valor_abst			decimal(10,2) not null,
+	data_abst			date not null,
+	forma_pgto			integer not null,
+	data_venc			date not null,
+	data_pgto			date not null,
+	CONSTRAINT PK_ABASTECIMENTO PRIMARY KEY (cod_abst,cnpj_posto),
+	CONSTRAINT FK_ABASTECIMENTO_POSTO FOREIGN KEY (cnpj_posto) REFERENCES POSTO (cnpj),
+	CONSTRAINT FK_ABASTECIMENTO_EMPREGADO FOREIGN KEY (mat_empregado) REFERENCES EMPREGADO (matricula),
+	CONSTRAINT FK_ABASTECIMENTO_CLIENTE FOREIGN KEY (cpf_cnpj) REFERENCES CLIENTE (cpf_cnpj),
+	CONSTRAINT FK_ABASTECIMENTO_DEPENDENTE FOREIGN KEY (cnh_dep, cpf_titular_dep) REFERENCES DEPENDENTE (cnh, cpf_titular),
+	CONSTRAINT FK_ABASTECIMENTO_PAGAMENTO FOREIGN KEY (forma_pgto) REFERENCES PAGAMENTO (cod_pgto)
+);
