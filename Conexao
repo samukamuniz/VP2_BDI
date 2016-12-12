@@ -13,7 +13,7 @@ public class Conexao {
 		
 	public void iniciarConexao() throws SQLException, Exception {
 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
-		connection = DriverManager.getConnection(connectionUrl, "samuka", "Samv1602");
+		connection = DriverManager.getConnection(connectionUrl, "usuario", "senha");
 	}
 	
 	public ResultSet realizarConsulta(String consulta) throws SQLException{
