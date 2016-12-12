@@ -1,0 +1,30 @@
+CREATE VIEW PESQUISA1
+AS
+
+SELECT 
+	p.cnpj,p.razao_social,p.banco bancoPosto,p.agencia agenciaPosto,p.conta contaPosto,
+	c.cpf_cnpj Cliente,c.banco bancoCliente,c.agencia agenciaCliente,c.conta contaCliente,
+	ab.data_abst,ab.valor_abst,ab.data_venc,pg.descricao
+FROM 
+	POSTO P, ABASTECIMENTO AB, PAGAMENTO PG, CLIENTE C
+WHERE 
+	ab.cnpj_posto=p.cnpj and
+	ab.cpf_cnpj=c.cpf_cnpj and
+	ab.forma_pgto=pg.cod_pgto and
+	pg.descricao='convenio'
+
+UNION
+
+SELECT p.cnpj,p.razao_social,p.banco,p.agencia,p.conta,
+		dep.cnh,c.banco,c.agencia,c.conta,
+		ab.data_abst,ab.valor_abst,ab.data_venc,pg.descricao
+FROM 
+	ABASTECIMENTO AB, PAGAMENTO PG, POSTO P, DEPENDENTE dep, CLIENTE_FIS cf, CLIENTE c
+WHERE 
+	ab.cnpj_posto=p.cnpj and
+	ab.cnh_dep=dep.cnh and
+	ab.cpf_titular_dep=dep.cpf_titular and
+	dep.cpf_titular=cf.cpf and
+	c.cpf_cnpj=cf.cpf and
+	ab.forma_pgto=pg.cod_pgto and
+	pg.descricao='convenio'
