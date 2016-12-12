@@ -1,0 +1,25 @@
+CREATE VIEW PESQUISA2
+
+AS
+
+SELECT ab.cpf_cnpj Cliente,count(*)as qtd_abastecimentos,SUM(AB.valor_abst) Valor_abastecido, 
+pg.descricao Forma_pgto,month(ab.data_abst) Mes
+
+FROM CLIENTE C, ABASTECIMENTO AB, PAGAMENTO pg
+
+WHERE 
+	ab.cpf_cnpj = c.cpf_cnpj and
+	ab.forma_pgto = pg.cod_pgto
+GROUP BY month(ab.data_abst),ab.cpf_cnpj,pg.descricao
+
+UNION
+
+SELECT ab.cnh_dep,count(*)as qtd_abastecimentos,SUM(AB.valor_abst) Valor_abastecido, 
+pg.descricao Forma_pgto,month(ab.data_abst) Mes
+
+FROM DEPENDENTE dep, ABASTECIMENTO AB, PAGAMENTO pg
+
+WHERE 
+	ab.cnh_dep = dep.cnh and
+	ab.forma_pgto = pg.cod_pgto
+GROUP BY month(ab.data_abst),ab.cnh_dep,pg.descricao
